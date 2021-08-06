@@ -1,0 +1,46 @@
+---
+author: Laxman Panthi
+title: 'ANLY545 Assignement #5'
+output: html_notebook
+---
+
+##Exercise 1: 
+For the Donner Party data in Donner, examine Grayson’s 1990 claim that survival in the Donner Party was also mediated by the size of the family unit. This takes some care, because the family variable in the Donner data is a simplified grouping based on the person’s name and known alliances among families from the historical record. Use the following code to compute a family.size variable from each individual’s last name:
+
+```{r }
+data("Donner", package="vcdExtra")
+Donner$survived <- factor(Donner$survived, labels=c("no", "yes")) # use last name for family
+lname <- strsplit(rownames(Donner), ",")
+lname <- sapply(lname, function(x) x[[1]])
+Donner$family.size <- as.vector(table(lname)[lname])
+```
+
+1. Choose one of the models (donner.mod4, donner.mod6) from the lecture notes (example) that include the interaction of age and sex and non-linear terms in age. Fit a new model that adds a main effect of family.size. What do you conclude about Grayson’s claim?
+
+```{r}
+library(car)
+donner.mod41 <- glm(survived ~ poly(age,2) * sex + family.size, data=Donner, family=binomial)
+Anova(donner.mod41)
+```
+
+The effect of family size on the model seems significant.
+
+2. Produce an effect plot for this model.
+```{r}
+library(effects)
+donner.eff41 <- allEffects(donner.mod41, xlevels=list(age=seq(0,50,5)))
+plot(donner.eff41, ticks=list(n=8))
+```
+
+3. Continue, by examining whether the effect of family size can be taken as linear, or whether a non-linear term should be added
+```{r}
+donner.mod42 <- glm(survived ~ poly(age,2) * sex + poly(family.size, 2), data=Donner, family=binomial)
+Anova(donner.mod42)
+```
+
+```{r}
+donner.eff42 <- allEffects(donner.mod42, xlevels=list(age=seq(0,50,5)))
+plot(donner.eff42, ticks=list(n=8))
+```
+
+It appears that the effect of family size is non linear in this model.

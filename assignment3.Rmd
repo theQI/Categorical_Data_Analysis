@@ -1,0 +1,102 @@
+---
+title: "Assignment #3"
+output: html_notebook
+---
+
+```{r}
+library(tidyverse)
+```
+
+
+#### Exercise 3.1 
+See the Arbuthnot data in HistData library. The Arbuthnot data set refers to Dr. John Arbuthnot, an 18th century physician, writer, and mathematician. He was interested in the ratio of newborn boys to newborn girls, so he gathered the christening records for children born in London for every year from 1629 to 1710. It also contains the variable Ratio, giving the ratio of male to female births.
+
+```{r}
+library(HistData)
+data("Arbuthnot")
+summary(Arbuthnot)
+```
+
+(a)	Make a plot of Ratio over Year. What features stand out? Which plot do you prefer to display the tendency for more male births?
+```{r}
+ggplot(Arbuthnot, aes(x=Year,y=Ratio))+ geom_line()
+```
+ I think a line chart is the best way to plot a time series specially if it across several years.
+ 
+ (b) Plot the total number of christenings, Males + Females or Total (in 000s) over time. What unusual features do you see?
+```{r}
+ggplot(Arbuthnot, aes(x=Year,y=(Males+Females)))+ geom_line()+geom_point(aes(color=Total)) +
+  labs(title='Total Christenings year over year',x="Year", y="Total Christenings") +
+  theme_classic()+
+  geom_smooth(method = "lm")
+```
+The total number has been on a rise since 1660 although there was adecline on 1640.
+
+#### Exercise 3.1
+Use the data set WomenQueue to:
+```{r}
+library(vcd)
+data("WomenQueue")
+summary(WomenQueue)
+```
+(c)	Make a reasonable plot showing departure from the binomial distribution.
+```{r}
+barplot(WomenQueue,xlab="Counts",ylab="Frequency")
+```
+
+```{r}
+x <- goodfit(WomenQueue, type="binomial",par = list(size = 10))
+summary(x)
+```
+
+```{r}
+plot(x)
+```
+Above, I plotted the bar plot for the counts and created the rotogram which shows the deviation from the actual values, this indicates the counts deviate from the binomial distribution.
+
+(d)	Suggest some reasons why the number of women in queues of length 10 might depart from a binomial distribution, Bin(n = 10, p = 1/2).
+```{r}
+y <- goodfit(WomenQueue, type= "binomial", par = list(prob = .5,size = 10))
+summary(y)
+
+
+```
+```{r}
+plot(y,xlab="Counts",main = 'Bin(n=10, p=1/2)')
+```
+
+```{r}
+distplot(WomenQueue, type = c("binomial"), conf_level = 0.95)
+```
+
+The above indicates that there is a departure from the binomial distribution.
+
+#### Exercise 3.4 
+Work on the distribution of male children in families in “Saxony” by fitting a binomial distribution, (n=12,p=1/2) , specifying equal probability for boys and girls. [Hint: you need to specify both size and prob values for goodfit ().]
+```{r}
+data('Saxony')
+summary(Saxony)
+```
+
+Carry out the GOF test for this fixed binomial distribution. What is the ratio of χ2/df? What do you conclude?
+```{r}
+z <- goodfit(Saxony, type = "binomial", par = list(prob = .5,size = 12))
+summary(z)
+```
+Not a binomial distribution, null hypothesis is rejected.
+
+Test the additional lack of fit for the model Bin(n=12,p=1/2) compared to the model Bin(n=12,p=p ̂) where p ̂ is estimated from the data
+```{r}
+a <- goodfit(Saxony, type = "binomial", par = list(size = 12))
+summary(a) 
+```
+
+Use the plot(goodfit ()) method to visualize these two models
+```{r}
+plot(z)
+```
+
+```{r}
+plot(a)
+```
+

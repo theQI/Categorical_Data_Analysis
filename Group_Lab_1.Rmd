@@ -1,0 +1,97 @@
+---
+title: "Lab_1"
+author: "Group 1"
+date: "8/8/2019"
+output:
+  word_document: default
+  html_document: default
+---
+
+## Lab 1
+### Data Exploration
+
+```{r packages}
+library(tidyverse)
+library(gridExtra)
+```
+
+
+```{r load}
+df <- read_csv("survey_responses.csv", )
+```
+
+#### Data Pre-processing
+
+```{r clean}
+# remove columns that are not required and convert other characters to factors
+df_clean <- df%>%select(-Timestamp)%>% unclass %>% data.frame
+str(df_clean)
+```
+
+```{r wrangle}
+# Shorten the column_names, also store the orig columns as key
+orig_colnames <- colnames(df_clean)%>% str_replace_all("[^[:alnum:]]", " ")
+new_colnames <- c("Q1","Q2","Q3","Q4","Q5","Q6","Q7")
+colnames_key <- data.frame(new_colnames, orig_colnames)
+colnames(df_clean) <- new_colnames
+```
+
+
+```{r summary}
+summary(df_clean)
+```
+
+
+#### Plotting Charts
+```{r}
+x1 <- df_clean%>%group_by(Q1)%>%count()
+x2 <- df_clean%>%group_by(Q2)%>%count()
+x3 <- df_clean%>%group_by(Q3)%>%count()
+x4 <- df_clean%>%group_by(Q4)%>%count()
+x5 <- df_clean%>%group_by(Q5)%>%count()
+x6 <- df_clean%>%group_by(Q6)%>%count()
+x7 <- df_clean%>%group_by(Q7)%>%count()
+```
+
+##### Pie Charts
+```{r pie charts}
+par(mfrow = c(2, 4))  # Set up a 4 x 2 plotting space
+
+# Plot pie of x's
+pie(x = x1$n, labels = x1$Q1, xlab = paste(strwrap(orig_colnames[1],width=25),collapse="\n"))
+pie(x = x2$n, labels = x2$Q2, xlab = paste(strwrap(orig_colnames[2],width=25),collapse="\n"))
+pie(x = x3$n, labels = x3$Q3, xlab = paste(strwrap(orig_colnames[3],width=25),collapse="\n"))
+pie(x = x4$n, labels = x4$Q4, xlab = paste(strwrap(orig_colnames[4],width=25),collapse="\n"))
+pie(x = x5$n, labels = x5$Q5, xlab = paste(strwrap(orig_colnames[5],width=25),collapse="\n"))
+pie(x = x6$n, labels = x6$Q6, xlab = paste(strwrap(orig_colnames[6],width=25),collapse="\n"))
+pie(x = x7$n, labels = x7$Q7, xlab = paste(strwrap(orig_colnames[7],width=25),collapse="\n"))
+```
+
+##### Bar Charts
+```{r bar charts}
+par(mfrow = c(2, 4))
+b1 <- x1%>%ggplot(aes(x=str_wrap(Q1,width = 16),y=n))+geom_bar(stat="identity")+xlab("") + ylab("Count")
+b2 <- x2%>%ggplot(aes(x=str_wrap(Q2,width = 16),y=n))+geom_bar(stat="identity")+xlab("") + ylab("Count")
+b3 <- x3%>%ggplot(aes(x=str_wrap(Q3,width = 16),y=n))+geom_bar(stat="identity")+xlab("") + ylab("Count")
+b4 <- x4%>%ggplot(aes(x=str_wrap(Q4,width = 16),y=n))+geom_bar(stat="identity")+xlab("") + ylab("Count")
+b5 <- x5%>%ggplot(aes(x=str_wrap(Q5,width = 16),y=n))+geom_bar(stat="identity")+xlab("") + ylab("Count")
+b6 <- x6%>%ggplot(aes(x=str_wrap(Q6,width = 16),y=n))+geom_bar(stat="identity")+xlab("") + ylab("Count")
+b7 <- x7%>%ggplot(aes(x=str_wrap(Q7,width = 16),y=n))+geom_bar(stat="identity")+xlab("") + ylab("Count")
+grid.arrange(b1,b2,b3,b4,b5,b6,b7,ncol=2,nrow=4)
+```
+
+
+#### Analysis
+
+##### Linear Regression
+```{r}
+fit1<-glm(Q1~., data=df_clean, family = "binomial")
+summary(fit1)
+```
+
+```{r}
+fit2<-glm(Q7~., data=df_clean, family = "binomial")
+summary(fit2)
+```
+
+None of the variable are significant predictors.

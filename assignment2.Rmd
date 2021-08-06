@@ -1,0 +1,79 @@
+---
+title: "ANLY 545 - Assignment 2"
+author: "Laxman Panthi"
+output:
+  html_document:
+    df_print: paged
+---
+
+### Exercise 2.3 
+The data set UCBAdmissions is a 3-way table of frequencies classified by Admit, Gender, and Dept.
+```{r, data = UCBAdmissions}
+data("UCBAdmissions")
+ftable(UCBAdmissions)
+```
+
+(a)	Find the total number of cases contained in this table.
+```{r}
+# save typing 
+sum(UCBAdmissions)
+```
+
+(b)	For each department, find the total number of applicants.
+```{r}
+margin.table(UCBAdmissions, 3)
+```
+
+
+(c)	For each department, find the overall proportion of applicants who were admitted.
+```{r}
+tab1 <- margin.table(UCBAdmissions , c(1,3)) 
+
+tab1[1,] / margin.table(UCBAdmissions, 3) 
+```
+
+
+
+(d)	Construct a tabular display of department (rows) and gender (columns), showing the proportion of applicants in each cell who were admitted relative to the total applicants in that cell.
+```{r}
+#proportion in each cell admitted
+admit <- UCBAdmissions[1,,] 
+reject <- UCBAdmissions[2,,]
+admit / (admit+reject)
+```
+
+### Exercise 2.5 
+The data set UKSoccer in vcd gives the distributions of number of goals scored by the 20 teams in the 1995/96 season of the Premier League of the UK Football Association.
+This two-way table classifies all 20 × 19 = 380 games by the joint outcome (Home, Away), the number of goals scored by the Home and Away teams. The value 4 in this table actually represents 4 or more goals.
+```{r}
+library(vcd) 
+data(UKSoccer)
+```
+
+(a)	Verify that the total number of games represented in this table is 380.
+```{r}
+sum(UKSoccer)
+```
+
+(b)	Find the marginal total of the number of goals scored by each of the home and away teams.
+```{r}
+#marginal totals
+(home <- margin.table(UKSoccer, 1))
+(away <- margin.table(UKSoccer, 2))
+```
+
+(c)	Express each of the marginal totals as proportions.
+```{r}
+#proportions
+(home_prop <- prop.table(margin.table(UKSoccer,1)))
+(away_prop <- prop.table(margin.table(UKSoccer,2)))
+```
+
+Optional: (d)	Comment on the distribution of the numbers of home-team and away-team goals. Is there any evidence that home teams score more goals on average?
+
+```{r}
+summary(UKSoccer)
+```
+p-value 0.2846 indicates the null hypothesis cannot be rejected. There is no significant difference between the two factors.
+
+

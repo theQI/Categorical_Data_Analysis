@@ -1,0 +1,102 @@
+---
+title: "ANLY545-91-0 HW4"
+author: 'Group 1: Laxman Panthi, Fuyan Li, Akhilesh Mannava, Harsh Patel'
+date: "9/18/2019"
+output:
+  word_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(MASS)
+library(vcdExtra)
+```
+
+# HOMEWORK 4
+
+## Exercise #1
+Bertin (1983, pp. 30-31) used a 4-way table of frequencies of traffic accident victims in France in 1958 to illustrate his scheme for classifying data sets by numerous variables, each of which could have various types and could be assigned to various visual attributes. His data are contained in Accident in vcdExtra, a frequency data frame representing his 5 × 2 × 4 × 2 table of the variables age, result (died or injured), mode of transportation, and gender.
+
+```{r}
+data('Accident', package='vcdExtra')
+str(Accident)
+```
+
+1) Use loglm() to fit the model of mutual independence, Freq ~ age+mode+gender+result to this data set.
+
+```{r}
+f.lm <-loglm(Freq ~ age + mode+ gender+result, data=Accident)
+summary(f.lm)
+
+```
+
+2) Use mosaic() to produce an interpretable mosaic plot of the associations among all variables under the model of mutual independence.
+```{r}
+f.m1<-mosaic(f.lm , abbreviate_labs=TRUE, clip=FALSE)
+```
+
+3) Try different orders of the variables in the mosaic. (Hint: the abbreviate component of the labeling_args argument to mosaic() will be useful to avoid some overlap of the category labels.)
+
+```{r}
+f.lm2 <- loglm(Freq ~ mode+gender+age+result, data=Accident)
+f.m2 <- mosaic(f.lm2, abbreviate_labs=TRUE)
+```
+
+```{r}
+f.lm3 <- loglm(Freq ~ gender+result+age+mode, data=Accident)
+f.m3 <- mosaic(f.lm3, abbreviate_labs=TRUE)
+```
+
+```{r}
+f.lm4 <- loglm(Freq ~ mode+result+gender+age, data=Accident)
+f.m4 <- mosaic(f.lm4, abbreviate_labs=TRUE)
+```
+
+4) Treat result (“Died” vs. “Injured”) as the response variable, and fit the model Freq ~ age mode gender + result that asserts independence of result from all others jointly.
+
+```{r}
+loglm(Freq ~ age * mode * gender + result, data = Accident)
+```
+
+5) Construct a mosaic display for the residual associations in this model. Which combinations of the predictor factors are more likely to result in death?
+
+```{r}
+mosaic(loglm(Freq ~ age * mode * gender + result, data = Accident), gp = shading_Friendly, labeling = labeling_residuals)
+```
+
+# Exercise #2
+
+The data set caith in MASS (Ripley, 2015) gives another classic 4×5 table tabulating hair color and eye color, this for people in Caithness, Scotland, originally from Fisher (1940). The data is stored as a data frame of cell frequencies, whose rows are eye colors and whose columns are hair colors.
+```{r}
+data("caith", package="MASS")
+caith
+```
+
+
+(1) The loglm() and mosaic() functions don’t understand data in this format, so use Caith <- as.matrix(caith) to convert to array form. Examine the result, and use names(dimnames(Caith))<-c() to assign appropriate names to the row and column dimensions.
+
+```{r}
+Caith <- as.matrix(caith)
+names(dimnames(Caith))<-c("Eye_Color","Hair_Color") 
+Caith
+```
+
+(2) Fit the model of independence to the resulting matrix using loglm().
+
+```{r}
+model=loglm(Freq ~ Eye_Color + Hair_Color, data = Caith)
+anova(model)
+```
+
+(3) Calculate and display the residuals for this model.
+```{r}
+LRstats(model)
+```
+
+(4) Create a mosaic display for this data.
+```{r}
+mosaic(Caith, shade=TRUE, gp = shading_Friendly, labeling_args = list(rot_labels=c(60, 60, 60, 60)))
+```
+
+

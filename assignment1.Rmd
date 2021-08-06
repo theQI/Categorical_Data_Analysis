@@ -1,0 +1,111 @@
+---
+title: "ANLY 545 - Assignment 1"
+author: "Laxman Panthi"
+output:
+  html_document:
+    df_print: paged
+---
+
+### Exercise 1
+
+```{r}
+# Load data
+data(UCBAdmissions)
+```
+
+
+```{r}
+# save typing 
+ftable(UCBAdmissions)
+```
+
+```{r}
+# gets the sum
+sum(UCBAdmissions)
+```
+
+
+```{r}
+#total applicants for each dept
+margin.table(UCBAdmissions, 3)
+
+# same thinf
+apply(UCBAdmissions, 3, sum)
+```
+
+
+```{r}
+#proportion admited for each dept
+tab1 <- margin.table(UCBAdmissions , c(1,3)) 
+
+tab1[1,] / margin.table(UCBAdmissions, 3) # or, using prop.table prop.table(margin.table(UCB, c(1, 3)),2)
+```
+
+
+```{r}
+
+#proportion in each cell admitted
+admit <- UCBAdmissions[1,,] 
+reject <- UCBAdmissions[2,,]
+admit / (admit+reject)
+```
+
+### Exercise 2
+
+
+```{r}
+library(vcd) 
+data(UKSoccer) # total games sum(UKSoccer)
+```
+
+```{r}
+#marginal totals
+addmargins(UKSoccer) # or 
+rowSums(UKSoccer) 
+colSums(UKSoccer) # or 
+```
+
+```{r}
+home <- margin.table(UKSoccer, 1) 
+away <- margin.table(UKSoccer, 2)
+home
+away
+```
+
+```{r}
+#proportions
+prop.table(margin.table(UKSoccer,1)) 
+prop.table(margin.table(UKSoccer,2))
+```
+
+```{r}
+#compare distribution of home & away goals
+
+goodfit(home, type='poisson') 
+goodfit(away, type='poisson') 
+plot(goodfit(home, type='poisson')) 
+plot(goodfit(away, type='poisson'))
+```
+
+```{r}
+#make a 5 x 2 table
+tab <- rbind(home,away) 
+names(dimnames(tab)) <- c('Team', 'Goals') 
+chisq.test(tab) 
+mosaic(tab, shade=TRUE)
+```
+
+```{r}
+#mean goals scores– need to use weighted.mean …
+weighted.mean(0:4, w=home) 
+weighted.mean(0:4, w=away) 
+# … or else expand frequencies to a data frame of 380 games 
+Home <- rep(0:4, times=home) 
+Away <- rep(0:4, times=away) 
+HA <- data.frame(Home, Away) 
+summary(HA)
+boxplot(HA, ylab='Goals scored')
+
+```
+
+
